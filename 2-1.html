@@ -1,0 +1,159 @@
+<html>
+	<head>
+	</head>
+	<body style="overflow: hidden;">
+		<canvas id="cnv" width="800" height="800"></canvas>
+
+        <div id="init-text" style="position: absolute; left: 45%; top: 45%">Press Space to start</div>
+
+		<script>
+			var instructions = ['UULLULLUULLLURDLDUURRDRRLDURDULLRURDUDULLLUULURURLRDRRRRULDRUULLLLUUDURDULDRRDRUDLRRLDLUDLDDRURURUURRRDDDLLRUDURDULUULLRRULLRULDUDRDRLDLURURUDDUDLURUDUDURLURURRURLUDDRURRDLUURLLRURRDUDLULULUDULDLLRRRDLRDLDUDRDDDRRUURRRRRUURRDRRDLURDRRURDLLUULULLRURDLDDDRRLLRRUURULURUUDDLRRUDDRURUUDLRLRDLRURRRDULLDLRUDDUULRDULURUURDULUDLLRRLDDLRDLRUDRLDDRLRRRDURDULLRRRDRRLUURURDRRDRRLDLUDURURLDUURDRUDRDDRLDRRLDLURURULLUURUDUUDLRLL',
+			'LLLULLULDDULRLLURLLLRUUDDLRUULRLULLDLLRRDRLRLRLLDRUUURULDRDDLUDLLDUDULLLRLULLLRULDRDRUDLLRLRLLUDULRRRLDRUULDDULLDULULLUDUDLDRDURDLDLLDUDRRRDLUURRUURULLURLDURLRRLLDDUUULDRLUUDUDLURLULUDURRDRLLDDDDDRRULLRLDULULDDRUURRDLUDDDUDURDDRDRULULLLLUURDURUUUULUDLRURRULRDDRURURLLRLUUDUUURDLLDDLUDRLLLUDLLLLULRLURDRRRDUUDLLDLDDDURRDDRURUURDDRURRLDDDURDLLUURUUULRLUURRUDRLLDLURDUDRLULDLRLULULUDDLRDUDRUDLUULUULDURDRRRRLRULLUDRDDRDLDUDRDRRLDLLLLUDDLRULDLLDDUULDDRRULRRUURUDRDURLLLDDUUDRUUDLULLDR',
+			'UDUUULLDDDDLUDLDULRLRDLULLDDRULDURRLURRUDLRRUDURRDUDRRRUULRLLRLUDLDRRDUURDDRDRDUUUDUDLDLLRRLUURLUUUDDDUURLULURRLURRRDRDURURUDRLRUURUDRUDDDRDRDLDRDURDLDRRDUUDLLURLDDURRRLULDRDRLLRLLLRURLDURDRLDRUURRLDLDRLDDDRLDLRLDURURLLLLDDRDUDLRULULLRDDLLUDRDRRLUUULDRLDURURDUDURLLDRRDUULDUUDLLDDRUUULRRULDDUDRDRLRULUUDUURULLDLLURLRRLDDDLLDRRDDRLDDLURRUDURULUDLLLDUDDLDLDLRUDUDRDUDDLDDLDULURDDUDRRUUURLDUURULLRLULUURLLLLDUUDURUUDUULULDRULRLRDULDLLURDLRUUUDDURLLLLDUDRLUUDUDRRURURRDRDDRULDLRLURDLLRRDRUUUURLDRURDUUDLDURUDDLRDDDDURRLRLUDRRDDURDDRLDDLLRR',
+			'ULDRUDURUDULLUDUDURLDLLRRULRRULRUDLULLLDRULLDURUULDDURDUUDLRDRUDUDDLDRDLUULRRDLRUULULUUUDUUDDRDRLLULLRRDLRRLUDRLULLUUUUURRDURLLRURRULLLRLURRULRDUURRLDDRRDRLULDDRRDRLULLRDLRRURUDURULRLUDRUDLUDDDUDUDDUDLLRDLLDRURULUDRLRRULRDDDDDRLDLRRLUUDLUURRDURRDLDLDUDRLULLULRLDRDUDLRULLULLRLDDRURLLLRLDDDLLLRURDDDLLUDLDLRLUULLLRULDRRDUDLRRDDULRLLDUURLLLLLDRULDRLLLUURDURRULURLDDLRRUDULUURRLULRDRDDLULULRRURLDLRRRUDURURDURDULURULLRLDD',
+			'DURLRRRDRULDLULUDULUURURRLULUDLURURDDURULLRRUUDLRURLDLRUDULDLLRRULLLLRRLRUULDLDLLRDUDLLRLULRLLUUULULRDLDLRRURLUDDRRLUUDDRRUDDRRURLRRULLDDULLLURRULUDLRRRURRULRLLLRULLRRURDRLURULLDULRLLLULLRLRLLLDRRRRDDDDDDULUUDUDULRURDRUDRLUULURDURLURRDRRRRDRRLLLLUDLRRDURURLLULUDDLRLRLRRUURLLURLDUULLRRDURRULRULURLLLRLUURRULLLURDDDRURDUDDULLRULUUUDDRURUUDUURURRDRURDUDRLLRRULURUDLDURLDLRRRRLLUURRLULDDDUUUURUULDLDRLDUDULDRRULDRDULURRUURDU`'];
+
+			var canvas = document.getElementById('cnv');
+			var gfx = canvas.getContext('2d');
+
+			var width = window.innerWidth;
+            var height = window.innerHeight;
+            var halfWidth = width / 2;
+            var halfHeight = height / 2;
+            var scale = height / 900;
+			var size = 300 * scale;
+
+
+            var valueMatrix = [[1, 4, 7], [2, 5, 8], [3, 6, 9]];
+
+			var currentLoop = null;
+
+			var state = {
+				current: 'idle',
+				currentInstruction: 0,
+				currentInstructionIndex: 0,
+				matrixPosition: {x: 1, y: 1},
+				code: new Array(5),
+				highlightCounter: 0
+            };
+
+			window.addEventListener('resize', resize, false);
+			function resize() {
+				canvas.width = width = window.innerWidth;
+				canvas.height = height = window.innerHeight;
+				halfWidth = width / 2;
+				halfHeight = height / 2;
+            	scale = height / 1000;
+				size = 300 * scale;
+				redraw();
+			}
+			resize();
+
+			function update() {
+				switch(state.current) {
+				case 'idle':
+					state.current = 'moving';
+					break;
+                case 'moving':
+                	if (state.currentInstruction >= instructions.length) {
+                		state.current = 'end';
+                		return;
+					}
+
+					switch(instructions[state.currentInstruction].charAt(state.currentInstructionIndex)) {
+					case 'U':
+						if (state.matrixPosition.y > 0) {
+							state.matrixPosition.y--;
+						}
+						break;
+					case 'D':
+						if (state.matrixPosition.y < 2) {
+							state.matrixPosition.y++;
+						}
+						break;
+					case 'L':
+						if (state.matrixPosition.x > 0) {
+							state.matrixPosition.x--;
+						}
+						break;
+					case 'R':
+						if (state.matrixPosition.x < 2) {
+							state.matrixPosition.x++;
+						}
+						break;
+					}
+
+					if (state.currentInstructionIndex === instructions[state.currentInstruction].length) {
+						state.code[state.currentInstruction] = valueMatrix[state.matrixPosition.x][state.matrixPosition.y];
+						state.currentInstructionIndex = 0;
+						state.currentInstruction++;
+						state.current = 'highlight';
+						state.highlightCounter = 20;
+					} else {
+						state.currentInstructionIndex++;
+					}
+                	break;
+                case 'highlight':
+                	if (state.highlightCounter === 0) {
+                		state.current = 'moving';
+					}
+					state.highlightCounter--;
+                	break;
+                }
+            }
+
+			gfx.strokeStyle = '#000000';
+			var numberCounter = 1;
+			function redraw() {
+				if (state.current !== 'idle') {
+					gfx.globalAlpha = 1;
+					gfx.fillStyle = '#FFFFFF';
+					gfx.fillRect(0, 0, width, height);
+
+					numberCounter = 1;
+					for (var i = 0; i < 3; i++) {
+						for (var j = 0; j < 3; j++) {
+							if (valueMatrix[state.matrixPosition.x][state.matrixPosition.y] === numberCounter) {
+								if (state.current === 'highlight') {
+									gfx.fillStyle = 'rgb(' + (255 - state.highlightCounter * 10) + ', 255, 18)';
+
+								} else {
+									gfx.fillStyle = '#fffa17';
+								}
+								gfx.fillRect(halfWidth - (450 * scale) + (j * size), halfHeight - (450 * scale) + (i * size), size, size);
+							}
+							gfx.rect(halfWidth - (450 * scale) + (j * size), halfHeight - (450 * scale) + (i * size), size, size);
+							gfx.stroke();
+							gfx.fillStyle = '#000000';
+							gfx.font = '40px tahoma';
+							gfx.fillText('' + numberCounter, halfWidth - (450 * scale) + (j * size) + (size / 2) - 10, halfHeight - (450 * scale) + (i * size) + (size / 2) + 10)
+							numberCounter++;
+						}
+					}
+
+					gfx.font = '60px tahoma';
+					gfx.fillText('[', halfWidth - (450 * scale) - 280, halfHeight + 20);
+					gfx.fillText((state.code[0] || '*'), halfWidth - (450 * scale) - 240, halfHeight + 20);
+					gfx.fillText((state.code[1] || '*'), halfWidth - (450 * scale) - 200, halfHeight + 20);
+					gfx.fillText((state.code[2] || '*'), halfWidth - (450 * scale) - 160, halfHeight + 20);
+					gfx.fillText((state.code[3] || '*'), halfWidth - (450 * scale) - 120, halfHeight + 20);
+					gfx.fillText((state.code[4] || '*'), halfWidth - (450 * scale) - 80, halfHeight + 20);
+					gfx.fillText(']', halfWidth - (450 * scale) - 40, halfHeight + 20);
+				}
+            }
+
+			document.getElementsByTagName('body')[0].onkeyup = function(event) {
+				if (event.keyCode === 32) {
+					if (currentLoop) {
+						clearInterval(currentLoop);
+                    }
+                    currentLoop = setInterval(function() {
+                    	update();
+                    	redraw();
+                    }, 16);
+                    document.getElementsByTagName('body')[0].removeChild(document.getElementById('init-text'));
+                }
+            }
+		</script>
+	</body>
+</html>

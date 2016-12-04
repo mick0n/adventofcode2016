@@ -1,0 +1,140 @@
+<html>
+	<head>
+	</head>
+	<body>
+		<canvas id="cnv" width="800" height="800"></canvas>
+
+        <div id="init-text" style="position: absolute; left: 45%; top: 45%">Press Space to start</div>
+
+		<script>
+			var directions = 'R4, R4, L1, R3, L5, R2, R5, R1, L4, R3, L5, R2, L3, L4, L3, R1, R5, R1, L3, L1, R3, L1, R2, R2, L2, R5, L3, L4, R4, R4, R2, L4, L1, R5, L1, L4, R4, L1, R1, L2, R5, L2, L3, R2, R1, L194, R2, L4, R49, R1, R3, L5, L4, L1, R4, R2, R1, L5, R3, L5, L4, R4, R4, L2, L3, R78, L5, R4, R191, R4, R3, R1, L2, R1, R3, L1, R3, R4, R2, L2, R1, R4, L5, R2, L2, L4, L2, R1, R2, L3, R5, R2, L3, L3, R3, L1, L1, R5, L4, L4, L2, R5, R1, R4, L3, L5, L4, R5, L4, R5, R4, L3, L2, L5, R4, R3, L3, R1, L5, R5, R1, L3, R2, L5, R5, L3, R1, R4, L5, R4, R2, R3, L4, L5, R3, R4, L5, L5, R4, L4, L4, R1, R5, R3, L1, L4, L3, L4, R1, L5, L1, R2, R2, R4, R4, L5, R4, R1, L1, L1, L3, L5, L2, R4, L3, L5, L4, L1, R3'.split(', ');
+
+			var canvas = document.getElementById('cnv');
+			var gfx = canvas.getContext('2d');
+
+			var width = window.innerWidth;
+            var height = window.innerHeight;
+
+            var scale = 2;
+
+			var currentLoop = null;
+
+			var state = {
+				current: 'walking',
+				currX: 0,
+                currY: 0,
+                currDir: 0,
+                steps: [],
+                distanceToGo: 0,
+                currDirectionIndex: -1,
+                signalSize: 0
+            };
+
+			window.addEventListener('resize', resize, false);
+			function resize() {
+				canvas.width = width = window.innerWidth;
+				canvas.height = height = window.innerHeight;
+				redraw();
+			}
+			resize();
+
+			function update() {
+				switch(state.current) {
+                case 'walking':
+
+                    if (state.distanceToGo === 0) {
+                        //Check next direction and plot course
+                        state.currDirectionIndex++;
+                        if (state.currDirectionIndex >= directions.length) {
+                            state.current = 'signal';
+                            return;
+                        }
+
+                        var direction = directions[state.currDirectionIndex].substr(0, 1);
+                        if (direction === 'L') {
+                            state.currDir = state.currDir === 0 ? 3 : state.currDir - 1;
+                        } else if (direction === 'R') {
+                            state.currDir = state.currDir === 3 ? 0 : state.currDir + 1;
+                        }
+                        state.distanceToGo = parseInt(directions[state.currDirectionIndex].substr(1, directions[state.currDirectionIndex].length));
+                    }
+
+                    switch(state.currDir) {
+                    case 0: state.currY--; break;
+                    case 1: state.currX++; break;
+                    case 2: state.currY++; break;
+                    case 3: state.currX--; break;
+                    }
+                    state.steps.push([state.currX, state.currY]);
+                    state.distanceToGo--;
+                	break;
+                case 'signal':
+                    if (state.signalSize >= 80) {
+                        state.current = 'idle';
+                        return;
+                    }
+
+                    state.signalSize++;
+                	break;
+                }
+            }
+
+			function redraw() {
+                gfx.globalAlpha = 1;
+				gfx.fillStyle = '#FFFFFF';
+				gfx.fillRect(0, 0, width, height);
+
+			    var r = 128, g = 128, b = 128;
+			    var increase = 'r';
+				for (var i = 0; i < state.steps.length; i++) {
+					gfx.fillStyle = 'rgb(' + r + ', ' + g + ', ' + b + ')';
+					gfx.fillRect(width / 2 + state.steps[i][0] * scale, height / 2 + state.steps[i][1] * scale, scale, scale);
+
+					switch (increase) {
+					case 'r':
+						r++;
+						if (g > 128) g--;
+						if (b > 128) b--;
+						if (r === 255) increase = 'g';
+						break;
+					case 'g':
+						if (r > 128) r--;
+						g++;
+						if (b > 128) b--;
+						if (g === 255) increase = 'b';
+						break;
+					case 'b':
+						if (r > 128) r--;
+						if (g > 128) g--;
+						b++;
+						if (b === 255) increase = 'r';
+						break;
+					}
+				}
+
+				if (state.current === 'signal') {
+					gfx.fillStyle = '#ff9d09';
+					gfx.fillText(state.currX + 'x' + state.currY, width / 2 + state.currX * scale, ((height / 2) - 10) + state.currY * scale);
+					gfx.globalAlpha = 1 - (state.signalSize / 80);
+					gfx.strokeStyle = '#ff9d09';
+					gfx.beginPath();
+					gfx.arc(width / 2 + state.currX * scale, height / 2 + state.currY * scale, state.signalSize * scale, 0, 2*Math.PI);
+					gfx.stroke();
+                }
+            }
+
+			document.getElementsByTagName('body')[0].onkeyup = function(event) {
+				if (event.keyCode === 32) {
+					if (currentLoop) {
+						clearInterval(currentLoop);
+                    }
+                    currentLoop = setInterval(function() {
+                    	update();
+                    	redraw();
+                    }, 16);
+                    document.getElementsByTagName('body')[0].removeChild(document.getElementById('init-text'));
+                }
+            }
+		</script>
+	</body>
+</html>
