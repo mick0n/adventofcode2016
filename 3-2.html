@@ -49,13 +49,12 @@
 	resize();
 
 	function update() {
-		console.log(state.currentInput + ' + ' + state.currentInputColumn);
 		switch(state.current) {
 		case 'idle':
 			state.current = 'addResult';
 			break;
 		case 'moving':
-            if (state.currentInputColumn === 3) {
+            if (state.currentInputColumn === 2) {
 			    state.currentInput += 3;
             	state.currentInputColumn = 0;
             } else {
@@ -75,9 +74,13 @@
 				return;
             }
 
+            let val1 = input[state.currentInput][state.currentInputColumn],
+					val2 = input[state.currentInput + 1][state.currentInputColumn],
+					val3 = input[state.currentInput + 2][state.currentInputColumn];
+
 		    if (input[state.currentInput][state.currentInputColumn] + input[state.currentInput + 1][state.currentInputColumn] > input[state.currentInput + 2][state.currentInputColumn] &&
 				input[state.currentInput][state.currentInputColumn] + input[state.currentInput + 2][state.currentInputColumn] > input[state.currentInput + 1][state.currentInputColumn] &&
-				input[state.currentInput][state.currentInputColumn + 1] + input[state.currentInput + 2][state.currentInputColumn] > input[state.currentInput][state.currentInputColumn]) {
+				input[state.currentInput + 1][state.currentInputColumn] + input[state.currentInput + 2][state.currentInputColumn] > input[state.currentInput][state.currentInputColumn]) {
 		    	state.successes++;
             } else {
 		    	state.fails++;
@@ -87,27 +90,28 @@
 		}
 	}
 
-	gfx.strokeStyle = '#000000';
 	function redraw() {
 		if (state.current !== 'idle') {
 			gfx.fillStyle = '#FFFFFF';
-			gfx.fillRect(halfWidth - 100, 0, (310 * scale), height);
+			gfx.fillRect(halfWidth - (105 * scale), 0, (300 * scale), height);
 
             gfx.font = (50 * scale) + 'px tahoma';
 			gfx.fillStyle = '#000000';
 			for (let i = 0; i < 19; i++) {
 				if (state.currentInput + i < input.length) {
-					gfx.fillText(input[state.currentInput + i][0], halfWidth - 100, height - (150 * scale) - (i * (44 * scale)));
-					gfx.fillText(input[state.currentInput + i][1], halfWidth - 20, height - (150 * scale) - (i * (44 * scale)));
-					gfx.fillText(input[state.currentInput + i][2], halfWidth + 60, height - (150 * scale) - (i * (44 * scale)));
+					gfx.fillText(input[state.currentInput + i][0], halfWidth - (100 * scale), height - (150 * scale) - (i * (44 * scale)));
+					gfx.fillText(input[state.currentInput + i][1], halfWidth, height - (150 * scale) - (i * (44 * scale)));
+					gfx.fillText(input[state.currentInput + i][2], halfWidth + (100 * scale), height - (150 * scale) - (i * (44 * scale)));
 				}
 			}
 
-			gfx.rect(halfWidth - 100 + (state.currentInputColumn * 80), height - (200 * scale), 80, 150);
+			gfx.strokeStyle = '#846262';
+			gfx.lineWidth = 3;
+			gfx.beginPath();
+			gfx.rect(halfWidth - (100 * scale) + (state.currentInputColumn * 100) * scale, height - (278 * scale), 80 * scale, 136 * scale);
 			gfx.stroke();
 
 			if (state.successes !== state.successesDrawn) {
-                gfx.strokeStyle = '#000000';
                 gfx.fillStyle = '#00FF00';
 				for (let j = 0; j < state.successes; j++) {
                     gfx.fillRect(halfWidth - 240 + ((6) * (j % 14)), height - (150 * scale) - (Math.floor(j / 14) * 6), 4, 4);
@@ -120,7 +124,6 @@
             }
 
 			if (state.fails !== state.failsDrawn) {
-				gfx.strokeStyle = '#000000';
 				gfx.fillStyle = '#FF0000';
 				for (let k = 0; k < state.fails; k++) {
 					gfx.fillRect(halfWidth + (240 * scale) + ((6) * (k % 14)), height - (150 * scale) - (Math.floor(k / 14) * 6), 4, 4);
@@ -134,38 +137,41 @@
 		}
 	}
 
-	function getScaledLength(input) {
-		return input * (100 / input);
-    }
-
 	function loop() {
 		update();
 		redraw();
 		currentLoop = requestAnimationFrame(loop);
 	}
 
-	document.getElementsByTagName('body')[0].onkeyup = function(event) {
-		if (event.keyCode === 32) {
-			if (currentLoop) {
-				cancelAnimationFrame(currentLoop);
-			}
-			currentLoop = requestAnimationFrame(loop);
-			state = {
-				current: 'idle',
-				currentInput: 0,
-				currentInputColumn: 0,
-				renderCounter: 0,
-				fails: 0,
-				failsDrawn: 0,
-				successes: 0,
-				successesDrawn: 0
-			};
-			if (document.getElementById('init-text')) {
-			    document.getElementsByTagName('body')[0].removeChild(document.getElementById('init-text'));
-            }
+	function start() {
+		if (currentLoop) {
+			cancelAnimationFrame(currentLoop);
+		}
+		currentLoop = requestAnimationFrame(loop);
+		state = {
+			current: 'idle',
+			currentInput: 0,
+			currentInputColumn: 0,
+			renderCounter: 0,
+			fails: 0,
+			failsDrawn: 0,
+			successes: 0,
+			successesDrawn: 0
+		};
+		gfx.fillStyle = '#FFFFFF';
+		gfx.fillRect(0, 0, width, height);
+		if (document.getElementById('init-text')) {
+			document.getElementsByTagName('body')[0].removeChild(document.getElementById('init-text'));
 		}
 	}
 
+	document.getElementsByTagName('body')[0].addEventListener('keyup', function(event) {
+		if (event.keyCode === 32) {
+			start();
+		}
+	}, false);
+
+	document.getElementsByTagName('body')[0].addEventListener('touch', start, false);
 </script>
 </body>
 </html>

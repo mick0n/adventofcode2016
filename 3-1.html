@@ -12,7 +12,6 @@
 	let state = {
 		current: 'idle',
 		currentInput: 0,
-        renderCounter: 0,
         fails: 0,
         failsDrawn: 0,
         successes: 0,
@@ -58,7 +57,6 @@
 				state.current = 'end';
 				return;
 			} else {
-                state.renderCounter = 0;
                 state.current = 'addResult';
 			    break;
             }
@@ -136,7 +134,6 @@
 			state = {
 				current: 'idle',
 				currentInput: 0,
-				renderCounter: 0,
 				fails: 0,
 				failsDrawn: 0,
 				successes: 0,
