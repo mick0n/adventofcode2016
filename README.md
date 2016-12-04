@@ -1,9 +1,9 @@
 # adventofcode2016
-My solutions for Advent Of Code 2016 challenges
+#### My solutions for Advent Of Code 2016 challenges
 
 Day 1 [Challenge1](https://rawgit.com/mick0n/adventofcode2016/master/1-1.html) [Challenge2](https://rawgit.com/mick0n/adventofcode2016/master/1-2.html)    
 Day 2 [Challenge1](https://rawgit.com/mick0n/adventofcode2016/master/2-1.html) [Challenge2](https://rawgit.com/mick0n/adventofcode2016/master/2-2.html)    
-Day 3 Challenge1 Challenge2    
+Day 3 [Challenge1](https://rawgit.com/mick0n/adventofcode2016/master/3-1.html)[Challenge2](https://rawgit.com/mick0n/adventofcode2016/master/3-2.html)    
 Day 4 Challenge1 Challenge2    
 Day 5 Challenge1 Challenge2    
 Day 6 Challenge1 Challenge2    

@@ -1,0 +1,16 @@
+{
+  "name": "adventofcode2016",
+  "version": "1.0.0",
+  "description": "My solutions for adventofcode 2016",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mick0n/adventofcode2016.git"
+  },
+  "keywords": [
+    "Adventofcode",
+    "2016"
+  ],
+  "author": "Mikael Norrman",
+  "license": "MIT",
+  "dependencies": {}
+}
