@@ -12,5 +12,7 @@
   ],
   "author": "Mikael Norrman",
   "license": "MIT",
-  "dependencies": {}
+  "dependencies": {
+    "express": "^4.14.0"
+  }
 }

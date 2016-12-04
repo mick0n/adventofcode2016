@@ -142,18 +142,28 @@
 				}
             }
 
-			document.getElementsByTagName('body')[0].onkeyup = function(event) {
+			function start() {
+				if (currentLoop) {
+					clearInterval(currentLoop);
+				}
+				currentLoop = setInterval(function() {
+					update();
+					redraw();
+				}, 16);
+				gfx.fillStyle = '#FFFFFF';
+				gfx.fillRect(0, 0, width, height);
+				if (document.getElementById('init-text')) {
+					document.getElementsByTagName('body')[0].removeChild(document.getElementById('init-text'));
+				}
+			}
+
+			document.getElementsByTagName('body')[0].addEventListener('keyup', function(event) {
 				if (event.keyCode === 32) {
-					if (currentLoop) {
-						clearInterval(currentLoop);
-                    }
-                    currentLoop = setInterval(function() {
-                    	update();
-                    	redraw();
-                    }, 16);
-                    document.getElementsByTagName('body')[0].removeChild(document.getElementById('init-text'));
-                }
-            }
+					start();
+				}
+			}, false);
+
+			document.getElementsByTagName('body')[0].addEventListener('touchstart', start, false);
 		</script>
 	</body>
 </html>

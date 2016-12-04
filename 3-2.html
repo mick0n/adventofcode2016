@@ -117,7 +117,7 @@
                     gfx.fillRect(halfWidth - 240 + ((6) * (j % 14)), height - (150 * scale) - (Math.floor(j / 14) * 6), 4, 4);
                 }
 				gfx.fillStyle = '#FFFFFF';
-				gfx.fillRect(halfWidth - 240, height - (140 * scale), 150, 50);
+				gfx.fillRect(halfWidth - 240, height - (140 * scale), 150, 70);
 				gfx.fillStyle = '#000000';
 				gfx.fillText('' + state.successes, halfWidth - 240, height - (100 * scale));
                 state.successesDrawn = state.successes;
@@ -129,7 +129,7 @@
 					gfx.fillRect(halfWidth + (240 * scale) + ((6) * (k % 14)), height - (150 * scale) - (Math.floor(k / 14) * 6), 4, 4);
 				}
 				gfx.fillStyle = '#FFFFFF';
-				gfx.fillRect(halfWidth + (240 * scale), height - (140 * scale), 150, 50);
+				gfx.fillRect(halfWidth + (240 * scale), height - (140 * scale), 150, 70);
 				gfx.fillStyle = '#000000';
 				gfx.fillText('' + state.fails, halfWidth + (240 * scale), height - (100 * scale));
 				state.failsDrawn = state.fails;

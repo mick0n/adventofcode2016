@@ -125,25 +125,33 @@
 		currentLoop = requestAnimationFrame(loop);
 	}
 
-	document.getElementsByTagName('body')[0].onkeyup = function(event) {
-		if (event.keyCode === 32) {
-			if (currentLoop) {
-				cancelAnimationFrame(currentLoop);
-			}
-			currentLoop = requestAnimationFrame(loop);
-			state = {
-				current: 'idle',
-				currentInput: 0,
-				fails: 0,
-				failsDrawn: 0,
-				successes: 0,
-				successesDrawn: 0
-			};
-			if (document.getElementById('init-text')) {
-			    document.getElementsByTagName('body')[0].removeChild(document.getElementById('init-text'));
-            }
+	function start() {
+		if (currentLoop) {
+			cancelAnimationFrame(currentLoop);
+		}
+		currentLoop = requestAnimationFrame(loop);
+		state = {
+			current: 'idle',
+			currentInput: 0,
+			fails: 0,
+			failsDrawn: 0,
+			successes: 0,
+			successesDrawn: 0
+		};
+		gfx.fillStyle = '#FFFFFF';
+		gfx.fillRect(0, 0, width, height);
+		if (document.getElementById('init-text')) {
+			document.getElementsByTagName('body')[0].removeChild(document.getElementById('init-text'));
 		}
 	}
+
+	document.getElementsByTagName('body')[0].addEventListener('keyup', function(event) {
+		if (event.keyCode === 32) {
+			start();
+		}
+	}, false);
+
+	document.getElementsByTagName('body')[0].addEventListener('touchstart', start, false);
 
 </script>
 </body>
