@@ -12,7 +12,7 @@
 	let state = {
 		current: 'idle',
 		currentIteration: 0,
-		currentPassword: ''
+		currentPassword: ['_','_','_','_','_','_','_','_']
 	};
 
 	let worker;
@@ -45,14 +45,15 @@
 	resize();
 
 	function startWorker() {
-		worker = new Worker('5-1-worker.js');
+		worker = new Worker('5-2-worker.js');
 		worker.postMessage({input: 'abbhdwsy', startIteration: state.currentIteration, amount: 50000 + Math.floor(Math.random() * 100000)});
 		worker.onmessage = function(message) {
 			state.currentIteration = message.data.iteration;
-			if (message.data.nextChar) {
-				state.currentPassword += message.data.nextChar;
+			if (message.data.nextChar && state.currentPassword[message.data.nextChar.position] === '_') {
+				console.log(message.data);
+				state.currentPassword[message.data.nextChar.position] = message.data.nextChar.char;
 			}
-			if (state.currentPassword.length !== 8) {
+			if (state.currentPassword.indexOf('_') !== -1) {
 				worker.terminate();
 				startWorker();
 			}
@@ -69,7 +70,7 @@
 				startWorker();
 				break;
 			case 'working':
-				if (state.currentPassword.length === 8) {
+				if (state.currentPassword.indexOf('_') === -1) {
 					state.current = 'end';
 				}
 				break;
@@ -83,13 +84,15 @@
 		var oscctx = offScreenCanvas.getContext('2d');
 		oscctx.strokeStyle = '#000000';
 		oscctx.fillStyle = '#FFFFFF';
-		oscctx.font = (40 * scale) + 'px tahoma';
+		oscctx.font = (30 * scale) + 'px tahoma';
 		oscctx.lineWidth = 3;
 		oscctx.fillRect(752 * scale, 0, 400, 50 * scale);
 		oscctx.beginPath();
 		oscctx.rect(0, 0, 750 * scale, 50 * scale);
 		oscctx.rect(0, 60 * scale, 750 * scale, 50 * scale);
 		oscctx.stroke();
+		oscctx.fillStyle = '#000000';
+		oscctx.fillText('Password: ', 10 * scale, 100 * scale);
 	}
 
 	function redraw() {
@@ -97,13 +100,19 @@
 			gfx.fillStyle = '#FFFFFF';
 			gfx.fillRect(0, 0, width, height);
 
-			gfx.fillStyle = state.currentPassword.length === 8 ? '#3aad48' : '#af3636';
+			gfx.fillStyle = state.currentPassword.indexOf('_') === -1 ? '#3aad48' : '#af3636';
 			gfx.fillRect(halfWidth - (400 * scale), halfHeight - (140 * scale), 750 * scale, 50 * scale);
 			gfx.fillStyle = '#000000';
 			gfx.font = (30 * scale) + 'px tahoma';
 			gfx.fillText('Cracking password for Door ID: ' + input + '....' , halfWidth - (390 * scale), halfHeight - (220 * scale));
 			gfx.fillText('Iteration: ' + state.currentIteration, halfWidth - (390 * scale), halfHeight - (160 * scale));
-			gfx.fillText('Password: ' + state.currentPassword, halfWidth - (390 * scale), halfHeight - (100 * scale));
+			for (var i = 0; i < 8; i++) {
+				if (state.currentPassword[i] === '_') {
+					gfx.fillText(Math.floor(Math.random() * 16).toString(16), halfWidth - (240 * scale) + (i * 26 * scale), halfHeight - (100 * scale));
+				} else {
+					gfx.fillText(state.currentPassword[i], halfWidth - (240 * scale) + (i * 26 * scale), halfHeight - (100 * scale));
+				}
+			}
 			gfx.drawImage(offScreenCanvas, halfWidth - (400 * scale), halfHeight - (200 * scale));
 		}
 	}
@@ -128,7 +137,7 @@
 		state = {
 			current: 'idle',
 			currentIteration: 0,
-			currentPassword: ''
+			currentPassword: ['_','_','_','_','_','_','_','_']
 		};
 		gfx.fillStyle = '#FFFFFF';
 		gfx.fillRect(0, 0, width, height);

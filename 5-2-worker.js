@@ -4,11 +4,11 @@ onmessage = function(options) {
 	let targetIteration = startIteration + parseInt(options.data.amount);
 	for (var i = startIteration; i < targetIteration; i++) {
 		hash = md5(options.data.input + '' + i);
-		if (hash.charAt(0) === '0' && hash.charAt(1) === '0' && hash.charAt(2) === '0' && hash.charAt(3) === '0' && hash.charAt(4) === '0') {
-			return postMessage({iteration: ++i, nextChar: hash.charAt(5)});
+		if (hash.charAt(0) === '0' && hash.charAt(1) === '0' && hash.charAt(2) === '0' && hash.charAt(3) === '0' && hash.charAt(4) === '0' && hash.charAt(5) < 8) {
+			return postMessage({iteration: ++i, nextChar: {position: hash.charAt(5), char: hash.charAt(6)}});
 		}
 	}
-	postMessage({iteration: (targetIteration)});
+	postMessage({iteration: targetIteration});
 };
 
 
