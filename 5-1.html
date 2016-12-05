@@ -1,0 +1,154 @@
+<html>
+<head>
+</head>
+<body style="overflow: hidden;">
+<canvas id="cnv" width="800" height="800"></canvas>
+
+<div id="init-text" style="position: absolute; left: 45%; top: 45%">Press Space to start</div>
+
+<script>
+	let input = 'abbhdwsy';
+
+	let state = {
+		current: 'idle',
+		currentIteration: 0,
+		currentPassword: ''
+	};
+
+	let worker;
+
+	const canvas = document.getElementById('cnv');
+	const gfx = canvas.getContext('2d');
+	let offScreenCanvas;
+
+	let width = window.innerWidth;
+	let height = window.innerHeight;
+	let halfWidth = width / 2;
+	let halfHeight = height / 2;
+	let scale = height / 1000;
+	predraw();
+
+	let currentLoop = null;
+
+	window.addEventListener('resize', resize, false);
+	function resize() {
+		canvas.width = width = window.innerWidth;
+		canvas.height = height = window.innerHeight;
+		halfWidth = width / 2;
+		halfHeight = height / 2;
+		scale = height / 1000;
+		gfx.fillStyle = '#FFFFFF';
+		gfx.fillRect(0, 0, width, height);
+		predraw();
+		redraw();
+	}
+	resize();
+
+	function startWorker() {
+		worker = new Worker('5-1-worker.js');
+		worker.postMessage({input: 'abbhdwsy', startIteration: state.currentIteration, amount: 50000 + Math.floor(Math.random() * 100000)});
+		worker.onmessage = function(message) {
+			state.currentIteration = message.data.iteration;
+			console.log('Iteration is: ' + state.currentIteration);
+			if (message.data.nextChar) {
+				console.log('We got a new character which is: ' + message.data.nextChar);
+				state.currentPassword += message.data.nextChar;
+			}
+			if (state.currentPassword.length === 8) {
+
+			} else {
+				worker.terminate();
+				startWorker();
+			}
+		};
+	}
+
+	function update() {
+		switch (state.current) {
+			case 'idle':
+				state.current = 'working';
+				if (worker) {
+					worker.terminate();
+				}
+				startWorker();
+				break;
+			case 'working':
+				if (state.currentPassword.length === 8) {
+					state.current = 'end';
+				}
+				break;
+		}
+	}
+
+	function predraw() {
+		offScreenCanvas = document.createElement('canvas');
+		offScreenCanvas.width = 1000 * scale;
+		offScreenCanvas.height = 1000 * scale;
+		var oscctx = offScreenCanvas.getContext('2d');
+		oscctx.strokeStyle = '#000000';
+		oscctx.fillStyle = '#FFFFFF';
+		oscctx.font = (40 * scale) + 'px tahoma';
+		oscctx.lineWidth = 3;
+		oscctx.fillRect(752 * scale, 0, 400, 50 * scale);
+		oscctx.beginPath();
+		oscctx.rect(0, 0, 750 * scale, 50 * scale);
+		oscctx.rect(0, 60 * scale, 750 * scale, 50 * scale);
+		oscctx.stroke();
+	}
+
+	function redraw() {
+		if (state.current !== 'idle') {
+			gfx.fillStyle = '#FFFFFF';
+			gfx.fillRect(0, 0, width, height);
+
+			gfx.fillStyle = state.currentPassword.length === 8 ? '#3aad48' : '#af3636';
+			gfx.fillRect(halfWidth - (400 * scale), halfHeight - (140 * scale), 750 * scale, 50 * scale);
+			gfx.fillStyle = '#000000';
+			gfx.font = (30 * scale) + 'px tahoma';
+			gfx.fillText('Cracking password for Door ID: ' + input + '....' , halfWidth - (390 * scale), halfHeight - (220 * scale));
+			gfx.fillText('Iteration: ' + state.currentIteration, halfWidth - (390 * scale), halfHeight - (160 * scale));
+			gfx.fillText('Password: ' + state.currentPassword, halfWidth - (390 * scale), halfHeight - (100 * scale));
+			gfx.drawImage(offScreenCanvas, halfWidth - (400 * scale), halfHeight - (200 * scale));
+		}
+	}
+
+	function loop() {
+		update();
+		redraw();
+		currentLoop = requestAnimationFrame(loop);
+	}
+
+	function start() {
+		if (state.current === 'waitInput') {
+			state.current = 'wait';
+			state.roomNames = [];
+			state.drawnRooms = 0;
+			return;
+		}
+		if (currentLoop) {
+			cancelAnimationFrame(currentLoop);
+		}
+		currentLoop = requestAnimationFrame(loop);
+		state = {
+			current: 'idle',
+			currentIteration: 0,
+			currentPassword: ''
+		};
+		gfx.fillStyle = '#FFFFFF';
+		gfx.fillRect(0, 0, width, height);
+		predraw();
+		if (document.getElementById('init-text')) {
+			document.getElementsByTagName('body')[0].removeChild(document.getElementById('init-text'));
+		}
+	}
+
+	document.getElementsByTagName('body')[0].addEventListener('keyup', function (event) {
+		if (event.keyCode === 32) {
+			start();
+		}
+	}, false);
+
+	document.getElementsByTagName('body')[0].addEventListener('touchstart', start, false);
+</script>
+</body>
+</html>
