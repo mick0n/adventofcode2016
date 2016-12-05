@@ -115,12 +115,6 @@
 	}
 
 	function start() {
-		if (state.current === 'waitInput') {
-			state.current = 'wait';
-			state.roomNames = [];
-			state.drawnRooms = 0;
-			return;
-		}
 		if (currentLoop) {
 			cancelAnimationFrame(currentLoop);
 		}

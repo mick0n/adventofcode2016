@@ -50,7 +50,6 @@
 		worker.onmessage = function(message) {
 			state.currentIteration = message.data.iteration;
 			if (message.data.nextChar && state.currentPassword[message.data.nextChar.position] === '_') {
-				console.log(message.data);
 				state.currentPassword[message.data.nextChar.position] = message.data.nextChar.char;
 			}
 			if (state.currentPassword.indexOf('_') !== -1) {
@@ -124,12 +123,6 @@
 	}
 
 	function start() {
-		if (state.current === 'waitInput') {
-			state.current = 'wait';
-			state.roomNames = [];
-			state.drawnRooms = 0;
-			return;
-		}
 		if (currentLoop) {
 			cancelAnimationFrame(currentLoop);
 		}
