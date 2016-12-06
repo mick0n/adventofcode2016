@@ -8,7 +8,7 @@ fs.readFile('challenge_4_data.txt', function(error, data) {
 	rows.forEach(function(row) {
 		outputString = outputString + '\'' + row.trim() + '\',';
 	});
-	fs.writeFile('challenge_4_data.txt', outputString, function() {
+	fs.writeFile('challenge_4_data_output.txt', outputString, function() {
 		if (error) throw error;
 	});
 });
