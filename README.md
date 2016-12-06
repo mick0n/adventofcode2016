@@ -6,7 +6,7 @@ Day 2 [Challenge1](https://rawgit.com/mick0n/adventofcode2016/master/2-1.html) [
 Day 3 [Challenge1](https://rawgit.com/mick0n/adventofcode2016/master/3-1.html) [Challenge2](https://rawgit.com/mick0n/adventofcode2016/master/3-2.html)    
 Day 4 [Challenge1](https://rawgit.com/mick0n/adventofcode2016/master/4-1.html) [Challenge2](https://rawgit.com/mick0n/adventofcode2016/master/4-2.html)    
 Day 5 [Challenge1](https://rawgit.com/mick0n/adventofcode2016/master/5-1.html) [Challenge2](https://rawgit.com/mick0n/adventofcode2016/master/5-2.html)    
-Day 6 [Challenge1](https://rawgit.com/mick0n/adventofcode2016/master/6-1.html) Challenge2    
+Day 6 [Challenge1](https://rawgit.com/mick0n/adventofcode2016/master/6-1.html) [Challenge2](https://rawgit.com/mick0n/adventofcode2016/master/6-2.html)    
 Day 7 Challenge1 Challenge2    
 Day 8 Challenge1 Challenge2    
 Day 9 Challenge1 Challenge2    
